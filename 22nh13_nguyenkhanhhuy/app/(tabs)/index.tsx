@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, FlatList, Alert, Modal, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -14,8 +14,8 @@ export default function OrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchOrderNo, setSearchOrderNo] = useState('');
+  const flatListRef = useRef<FlatList>(null);
 
- 
   useFocusEffect(
     useCallback(() => {
       const loadOrders = async () => {
@@ -83,13 +83,17 @@ export default function OrdersScreen() {
     );
   };
   const handleSearch = () => {
-    const foundOrder = orders.find(order => order.orderNo === Number(searchOrderNo));
-    if (foundOrder) {
+    const orderIndex = orders.findIndex(order => order.orderNo === Number(searchOrderNo));
+    
+    if (orderIndex !== -1) {
+      flatListRef.current?.scrollToIndex({
+        index: orderIndex,
+        animated: true,
+      });
       setIsSearchVisible(false);
       setSearchOrderNo('');
-    
     } else {
-      Alert.alert( `Not Found ${searchOrderNo}`);
+      Alert.alert('Not Found', `Order #${searchOrderNo} was not found`);
     }
   };
 
@@ -134,10 +138,16 @@ export default function OrdersScreen() {
       <ThemedText type="title" style={styles.header}>Orders</ThemedText>
       
       <FlatList
+        ref={flatListRef}
         data={orders}
         renderItem={renderOrderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(data, index) => ({
+          length: 180, 
+          offset: 180 * index + (16 * index), 
+          index,
+        })}
       />
 
       <Modal

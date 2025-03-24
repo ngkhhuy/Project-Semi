@@ -20,7 +20,7 @@ export const orderService = {
       
       const order: Order = {
         ...newOrder,
-        id: Date.now().toString(), // Generate unique ID
+        id: Date.now().toString(), 
         orderNo: orders.length + 1,
         status: 'Processing'
       };

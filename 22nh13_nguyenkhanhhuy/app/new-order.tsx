@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Alert, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { router } from 'expo-router';
@@ -33,7 +33,7 @@ export default function NewOrderScreen() {
         Alert.alert('Success', 'Order created successfully!', [
           {
             text: 'OK',
-            onPress: () => router.back() // Chỉ navigate back sau khi user bấm OK
+            onPress: () => router.back() 
           }
         ]);
       } else {
@@ -50,9 +50,23 @@ export default function NewOrderScreen() {
         options={{
           title: 'New Coffee Order',
           headerShown: true,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => router.back()}
+              style={{ marginLeft: 16, padding: 8 }}
+            >
+              <IconSymbol name="chevron.left" size={28} color="#0a7ea4" />
+            </TouchableOpacity>
+          ),
         }} 
       />
       <ThemedView style={styles.container}>
+        <Image 
+          source={require('../assets/images/cafe.jpg')}
+          style={styles.coffeeImage}
+          resizeMode="contain"
+        />
+
         <ThemedView style={styles.section}>
           <ThemedText type="subtitle">Choose Toppings</ThemedText>
           <ThemedView style={styles.toppingsContainer}>
@@ -95,12 +109,48 @@ export default function NewOrderScreen() {
           </ThemedView>
         </ThemedView>
 
-        <TouchableOpacity 
-          style={styles.orderButton}
-          onPress={handleCreateOrder}
-        >
-          <ThemedText style={styles.orderButtonText}>Order</ThemedText>
-        </TouchableOpacity>
+        <ThemedView style={styles.section}>
+          <ThemedText type="subtitle">Order Summary</ThemedText>
+          <ThemedView style={styles.summaryContainer}>
+            <ThemedView style={styles.summaryRow}>
+              <ThemedText>Add Cream:</ThemedText>
+              <ThemedText>{addCream ? 'Yes' : 'No'}</ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.summaryRow}>
+              <ThemedText>Add Chocolate:</ThemedText>
+              <ThemedText>{addChocolate ? 'Yes' : 'No'}</ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.summaryRow}>
+              <ThemedText>Quantity:</ThemedText>
+              <ThemedText>{quantity}</ThemedText>
+            </ThemedView>
+            <ThemedView style={[styles.summaryRow, styles.totalRow]}>
+              <ThemedText style={styles.totalText}>Price:</ThemedText>
+              <ThemedText style={styles.totalText}>
+                ${((2.00 * quantity) + (addCream ? 1 : 0) + (addChocolate ? 0.5 : 0)).toFixed(2)}
+              </ThemedText>
+            </ThemedView>
+            <ThemedView style={styles.thankYouContainer}>
+              <ThemedText style={styles.thankYouText}>THANK YOU</ThemedText>
+            </ThemedView>
+          </ThemedView>
+        </ThemedView>
+
+        <ThemedView style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.button, styles.backButton]}
+            onPress={() => router.back()}
+          >
+            <ThemedText style={styles.buttonText}>Back</ThemedText>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.button, styles.orderButton]}
+            onPress={handleCreateOrder}
+          >
+            <ThemedText style={styles.buttonText}>Order</ThemedText>
+          </TouchableOpacity>
+        </ThemedView>
       </ThemedView>
     </>
   );
@@ -162,16 +212,62 @@ const styles = StyleSheet.create({
     minWidth: 40,
     textAlign: 'center',
   },
-  orderButton: {
-    backgroundColor: '#4CAF50',
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 'auto',
+  },
+  button: {
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 'auto',
+    flex: 1,
   },
-  orderButtonText: {
+  backButton: {
+    backgroundColor: '#6c757d',
+  },
+  orderButton: {
+    backgroundColor: '#4CAF50',
+  },
+  buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  summaryContainer: {
+    backgroundColor: '#f5f5f5',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  totalRow: {
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+  },
+  totalText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  thankYouContainer: {
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  thankYouText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  coffeeImage: {
+    width: '100%',
+    height: 150,
+    marginBottom: 20,
+    alignSelf: 'center',
   },
 }); 
